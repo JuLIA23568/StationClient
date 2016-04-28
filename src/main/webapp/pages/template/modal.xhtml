@@ -1,0 +1,282 @@
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://java.sun.com/jsf/core">
+<h:head>
+    <script src="../resources/js/jquery-1.11.3.js"></script>
+    <script src="../resources/js/moment.js"></script>
+    <script src="../resources/js/transition.js"></script>
+    <script src="../resources/js/collapse.js"></script>
+    <script src="../resources/js/bootstrap.js"></script>
+    <script src="../resources/js/bootstrap-datetimepicker.js"></script>
+
+    <link rel="stylesheet" href="../resources/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="../resources/css/styles.css"/>
+
+    <title>Автовокзал "Центральный"</title>
+</h:head>
+<h:body>
+    <script>
+        function validateInput(regexString, event) {
+            var theEvent = window.event || event;
+            var key = theEvent.keyCode || theEvent.which;
+            if (key >= 46) {
+                key = String.fromCharCode(key);
+                var regex = new RegExp("^" + regexString + "$");
+                if (!regex.test(key)) {
+                    theEvent.returnValue = false;
+                    if (theEvent.preventDefault) {
+                        theEvent.preventDefault();
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!--login modal-->
+    <div id="loginModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h2 class="text-center"><img src="https://lh5.googleusercontent.com/-b0-k99FZlyE/AAAAAAAAAAI/AAAAAAAAAAA/eu7opA4byxI/photo.jpg?sz=100" class="img-circle"/><br/>Войти</h2>
+                </div>
+                <div class="modal-body">
+                    <h:form class="form col-md-12 center-block">
+                        <div class="form-group">
+                            <label>Логин</label>
+                            <h:inputText class="form-control input-lg" value="#{userBean.getUser().login}"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Пароль</label>
+                            <h:inputSecret class="form-control input-lg" value="#{userBean.getUser().password}"/>
+                        </div>
+                        <div class="form-group">
+                            <h:commandButton class="btn btn-primary btn-lg btn-block" action="#{userBean.login()}" value="Войти"></h:commandButton>
+                            <span class="pull-right">
+                                <h:commandLink action="#{userBean.registration()}" value="Регистрация"></h:commandLink>
+                            </span>
+                        </div>
+                    </h:form>
+                </div>
+                <div class="modal-footer">
+                    <div class="col-md-12">
+                        <button class="btn btn-danger" data-dismiss="modal" aria-hidden="true">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--about modal-->
+    <div id="aboutModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="text-center">О Проекте</h2>
+                </div>
+                <div class="modal-body">
+                    <div class="col-md-12 text-center">
+                        Курсовой Проект Азимовой Лолиты
+                        <br/><br/>
+                        Студентки Группы 373601
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="col-md-12">
+                        <button class="btn btn-danger" data-dismiss="modal" aria-hidden="true">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--bus modal-->
+    <div id="busModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="text-center">Добавить Автобус</h2>
+                </div>
+                <h:form>
+                    <div class="modal-body">
+                        <fieldset>
+                            <div class="form-group">
+                                <label>Марка Автобуса</label>
+                                <h:inputText value="#{busBean.bus.title}" styleClass="form-control"></h:inputText>
+                            </div>
+                            <div class="form-group">
+                                <label>Гос. Номер</label>
+                                <h:inputText value="#{busBean.bus.govId}" styleClass="form-control"></h:inputText>
+                            </div>
+                            <div class="form-group">
+                                <label>Количество Мест</label>
+                                <h:inputText value="#{busBean.bus.capacity}" styleClass="form-control" onkeypress="validateInput('[0-9]*', event)"></h:inputText>
+                            </div>
+                            <div class="form-group">
+                                <label>Описание</label>
+                                <h:inputTextarea value="#{busBean.bus.description}" styleClass="form-control"></h:inputTextarea>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="col-md-6">
+                            <h:commandButton action="#{busBean.post()}" styleClass="btn btn-success col-sm-12 col-md-12" value="Добавить" data-dismiss="modal" aria-hidden="true"></h:commandButton>
+                        </div>
+
+                        <div class="col-md-6">
+                            <button class="btn btn-danger col-sm-12 col-md-12" data-dismiss="modal" aria-hidden="true">Закрыть</button>
+                        </div>
+                    </div>
+                </h:form>
+            </div>
+        </div>
+    </div>
+
+    <!--destination modal-->
+    <div id="destinationModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="text-center">Добавить Маршрут</h2>
+                </div>
+                <h:form>
+                    <div class="modal-body">
+                        <fieldset>
+                            <div class="form-group">
+                                <label>Пункт Отправления</label>
+                                <h:inputText value="#{destinationBean.destination.departure}" styleClass="form-control"></h:inputText>
+                            </div>
+                            <div class="form-group">
+                                <label>Пункт Прибытия</label>
+                                <h:inputText value="#{destinationBean.destination.arrive}" styleClass="form-control"></h:inputText>
+                            </div>
+                            <div class="form-group">
+                                <label>Расстояние</label>
+                                <h:inputText value="#{destinationBean.destination.distance}" styleClass="form-control" onkeypress="validateInput('[0-9]*', event)"></h:inputText>
+                            </div>
+                            <div class="form-group">
+                                <label>Стоимость</label>
+                                <h:inputText value="#{destinationBean.destination.price}" styleClass="form-control" onkeypress="validateInput('[0-9]*', event)"></h:inputText>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="col-md-6">
+                            <h:commandButton action="#{destinationBean.post()}" styleClass="btn btn-success col-sm-12 col-md-12" value="Добавить" data-dismiss="modal" aria-hidden="true"></h:commandButton>
+                        </div>
+
+                        <div class="col-md-6">
+                            <button class="btn btn-danger col-sm-12 col-md-12" data-dismiss="modal" aria-hidden="true">Закрыть</button>
+                        </div>
+                    </div>
+                </h:form>
+            </div>
+        </div>
+    </div>
+
+    <!--user modal-->
+    <div id="userModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="text-center">Добавить Пользователя</h2>
+                </div>
+                <h:form>
+                    <div class="modal-body">
+                        <fieldset>
+                            <div class="form-group">
+                                <label>Логин</label>
+                                <h:inputText value="#{userBean.user.login}" styleClass="form-control"></h:inputText>
+                            </div>
+                            <div class="form-group">
+                                <label>Пароль</label>
+                                <h:inputSecret value="#{userBean.user.password}" styleClass="form-control"></h:inputSecret>
+                            </div>
+                            <div class="form-group">
+                                <label>Права Доступа</label>
+                                <h:selectOneMenu value="#{userBean.user.rights}" styleClass="form-control">
+                                    <f:selectItem itemValue="ROLE_USER" itemLabel="Пользователь"></f:selectItem>
+                                    <f:selectItem itemValue="ROLE_ADMIN" itemLabel="Администратор"></f:selectItem>
+                                </h:selectOneMenu>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="col-md-6">
+                            <h:commandButton action="#{userBean.post()}" styleClass="btn btn-success col-sm-12 col-md-12" value="Добавить" data-dismiss="modal" aria-hidden="true"></h:commandButton>
+                        </div>
+
+                        <div class="col-md-6">
+                            <button class="btn btn-danger col-sm-12 col-md-12" data-dismiss="modal" aria-hidden="true">Закрыть</button>
+                        </div>
+                    </div>
+                </h:form>
+            </div>
+        </div>
+    </div>
+
+    <!--user modal-->
+    <div id="routeModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="text-center">Добавить Рейс</h2>
+                </div>
+                <h:form>
+                    <div class="modal-body">
+                        <fieldset>
+                            <div class="form-group">
+                                <label>Дата Отправления</label>
+                                <div class="input-group date">
+                                    <h:inputText styleClass="form-control" value="#{routeBean.route.dateStart}">
+                                        <f:convertDateTime pattern="dd.MM.yyyy hh:mm"></f:convertDateTime>
+                                    </h:inputText>
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Дата Прибытия</label>
+                                <div class="input-group date">
+                                    <h:inputText styleClass="form-control" value="#{routeBean.route.dateEnd}">
+                                        <f:convertDateTime pattern="dd.MM.yyyy hh:mm"></f:convertDateTime>
+                                    </h:inputText>
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Маршрут</label>
+                                <h:selectOneMenu styleClass="form-control" value="#{routeBean.route.destination}">
+                                    <f:selectItems value="#{destinationBean.destinations}" var="d" itemValue="#{d}" itemLabel="#{d.departure} - #{d.arrive}"></f:selectItems>
+                                    <f:converter converterId="by.bsuir.station.destination"></f:converter>
+                                </h:selectOneMenu>
+                            </div>
+                            <div class="form-group">
+                                <label>Автобус</label>
+                                <h:selectOneMenu styleClass="form-control" value="#{routeBean.route.bus}">
+                                    <f:selectItems value="#{busBean.buses}" var="bus" itemValue="#{bus}" itemLabel="#{bus.title} (#{bus.govId})"></f:selectItems>
+                                    <f:converter converterId="by.bsuir.station.bus"></f:converter>
+                                </h:selectOneMenu>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="col-md-6">
+                            <h:commandButton action="#{routeBean.post()}" styleClass="btn btn-success col-sm-12 col-md-12" value="Добавить" data-dismiss="modal" aria-hidden="true"></h:commandButton>
+                        </div>
+
+                        <div class="col-md-6">
+                            <button class="btn btn-danger col-sm-12 col-md-12" data-dismiss="modal" aria-hidden="true">Закрыть</button>
+                        </div>
+                    </div>
+                </h:form>
+            </div>
+        </div>
+    </div>
+</h:body>
+</html> 

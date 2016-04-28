@@ -1,0 +1,128 @@
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core">
+<h:head>
+    <script src="../resources/js/jquery-1.11.3.js"></script>
+    <script src="../resources/js/moment.js"></script>
+    <script src="../resources/js/transition.js"></script>
+    <script src="../resources/js/collapse.js"></script>
+    <script src="../resources/js/bootstrap.js"></script>
+    <script src="../resources/js/bootstrap-datetimepicker.js"></script>
+
+    <link rel="stylesheet" href="../resources/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="../resources/css/normalize.css"/>
+    <link rel="stylesheet" href="../resources/css/styles.css"/>
+
+    <title>Автовокзал "Центральный" (Администрирование)</title>
+</h:head>
+<h:body>
+
+    <ui:include src="template/nav.xhtml"></ui:include>
+
+    <div class="container" id="main">
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4>Управление Рейсами</h4>
+                    </div>
+                    <div class="panel-body">
+                        <c:if test="#{routeBean.error != null and routeBean.error.length() > 0}">
+                            <div class="row">
+                                <div class="col-sm-offset-4 col-sm-4 col-md-4 col-md-offset-4">
+                                    <div class="alert alert-dismissible alert-danger">
+                                        <h:form>
+                                            <h:commandButton styleClass="close" data-dismiss="alert" action="#{routeBean.clearError()}" value="×"></h:commandButton>
+                                        </h:form>
+                                        <strong>Ошибка!</strong> #{routeBean.error}
+                                    </div>
+                                </div>
+                            </div>
+                        </c:if>
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12">
+                                <h:form>
+                                    <h:dataTable styleClass="table table-striped table-hover value=" value="#{routeBean.routes}" var="r">
+                                        <h:column>
+                                            <h:commandLink styleClass="glyphicon glyphicon-remove" style="color: red; text-decoration: none;" value="" action="#{routeBean.delete(r)}" />
+                                        </h:column>
+                                        <h:column>
+                                            <h:commandLink  styleClass="glyphicon glyphicon-edit" action="#{routeBean.makeEditable(r)}" rendered="#{not r.editable}"/>
+                                            <h:commandLink  styleClass="glyphicon glyphicon-save" action="#{routeBean.put(r)}" rendered="#{r.editable}"/>
+                                        </h:column>
+                                        <h:column>
+                                            <f:facet name="header">Дата Отправления</f:facet>
+                                            <h:panelGroup styleClass="input-group date" layout="block" rendered="#{r.editable}">
+                                                <h:inputText styleClass="form-control" value="#{r.dateStart}">
+                                                    <f:convertDateTime pattern="dd.MM.yyyy hh:mm"></f:convertDateTime>
+                                                </h:inputText>
+                                                <span class="input-group-addon">
+                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                                </span>
+                                            </h:panelGroup>
+                                            <h:outputText value="#{r.dateStart.toLocaleString()}" rendered="#{not r.editable}"></h:outputText>
+                                        </h:column>
+                                        <h:column>
+                                            <f:facet name="header">Дата Прибытия</f:facet>
+                                            <h:panelGroup styleClass="input-group date" layout="block" rendered="#{r.editable}">
+                                                <h:inputText styleClass="form-control" value="#{r.dateEnd}" >
+                                                    <f:convertDateTime pattern="dd.MM.yyyy hh:mm"></f:convertDateTime>
+                                                </h:inputText>
+                                                <span class="input-group-addon">
+                                                    <span class="glyphicon glyphicon-calendar"></span>
+                                                </span>
+                                            </h:panelGroup>
+                                            <h:outputText value="#{r.dateEnd.toLocaleString()}" rendered="#{not r.editable}"></h:outputText>
+                                        </h:column>
+                                        <h:column>
+                                            <f:facet name="header">Маршрут</f:facet>
+                                            <h:selectOneMenu styleClass="form-control" value="#{r.destination}" rendered="#{r.editable}">
+                                                <f:selectItems value="#{destinationBean.destinations}" var="d" itemValue="#{d}" itemLabel="#{d.departure} - #{d.arrive}"></f:selectItems>
+                                                <f:converter converterId="by.bsuir.station.destination"></f:converter>
+                                            </h:selectOneMenu>
+                                            <h:outputText value="#{r.destination.departure} - #{r.destination.arrive}" rendered="#{not r.editable}"></h:outputText>
+                                        </h:column>
+                                        <h:column>
+                                            <f:facet name="header">Автобус</f:facet>
+                                            <h:selectOneMenu styleClass="form-control" value="#{r.bus}" rendered="#{r.editable}">
+                                                <f:selectItems value="#{busBean.buses}" var="bus" itemValue="#{bus}" itemLabel="#{bus.title} (#{bus.govId})"></f:selectItems>
+                                                <f:converter converterId="by.bsuir.station.bus"></f:converter>
+                                            </h:selectOneMenu>
+                                            <h:outputText value="#{r.bus.title} (#{r.bus.govId})" rendered="#{not r.editable}"></h:outputText>
+                                        </h:column>
+                                        <h:column>
+                                            <f:facet name="header">Осталось Мест</f:facet>
+                                            #{r.placesLeft}
+                                        </h:column>
+                                    </h:dataTable>
+                                </h:form>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-6">
+                                <a href="#routeModal" class="btn btn-primary col-md-12 col-sm-12" role="button" data-toggle="modal">Добавить Рейс</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(function () {
+            $('.date').each(function(index, object) {
+                $(object).datetimepicker({
+                    locale: 'ru'
+                });
+            })
+        });
+    </script>
+
+    <ui:include src="template/modal.xhtml"></ui:include>
+
+</h:body>
+</html> 
